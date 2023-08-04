@@ -17,6 +17,7 @@ namespace Church.Data
 
         public IMongoCollection<User> Users => _database.GetCollection<User>("Users");
         public IMongoCollection<Role> Roles => _database.GetCollection<Role>("Roles");
+        public IMongoCollection<Visitor> Visitors => _database.GetCollection<Visitor>("Visitors");
         public IMongoCollection<ProfilePhoto> ProfilePhotos => _database.GetCollection<ProfilePhoto>("ProfilePhotos");
 
     }

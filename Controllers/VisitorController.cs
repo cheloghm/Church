@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Church.Models;
 using Church.ServiceInterfaces;
+using Church.DTO;
 
 namespace Church.Controllers
 {
@@ -21,14 +22,23 @@ namespace Church.Controllers
 
         // GET: api/Visitor
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Visitor>>> GetAllVisitors()
+        public async Task<ActionResult<IEnumerable<VisitorDTO>>> GetAllVisitors()
         {
-            return Ok(await _visitorService.GetAllVisitors());
+            var visitors = await _visitorService.GetAllVisitors();
+            return Ok(visitors.Select(v => new VisitorDTO
+            {
+                FullName = v.FullName,
+                GuestOf = v.GuestOf,
+                OtherRemarks = v.OtherRemarks,
+                DateEntered = v.DateEntered,
+                OtherGuests = v.OtherGuests
+            }));
         }
+
 
         // GET: api/Visitor/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Visitor>> GetVisitor(string id)
+        public async Task<ActionResult<VisitorDTO>> GetVisitor(string id)
         {
             var visitor = await _visitorService.GetVisitor(id);
 
@@ -37,16 +47,34 @@ namespace Church.Controllers
                 return NotFound();
             }
 
-            return visitor;
+            var visitorDTO = new VisitorDTO
+            {
+                FullName = visitor.FullName,
+                GuestOf = visitor.GuestOf,
+                OtherRemarks = visitor.OtherRemarks,
+                DateEntered = visitor.DateEntered,
+                OtherGuests = visitor.OtherGuests
+            };
+
+            return visitorDTO;
         }
 
         // POST: api/Visitor
         [HttpPost]
-        public async Task<ActionResult<Visitor>> PostVisitor(Visitor visitor)
+        public async Task<ActionResult<VisitorDTO>> PostVisitor(Visitor visitor)
         {
             await _visitorService.AddVisitor(visitor);
 
-            return CreatedAtAction("GetVisitor", new { id = visitor.Id }, visitor);
+            var visitorDTO = new VisitorDTO
+            {
+                FullName = visitor.FullName,
+                GuestOf = visitor.GuestOf,
+                OtherRemarks = visitor.OtherRemarks,
+                DateEntered = visitor.DateEntered,
+                OtherGuests = visitor.OtherGuests
+            };
+
+            return CreatedAtAction("GetVisitor", new { id = visitor.Id }, visitorDTO);
         }
 
         // DELETE: api/Visitor/5
@@ -63,7 +91,15 @@ namespace Church.Controllers
             try
             {
                 var visitors = _visitorService.GetVisitorsByDate(date);
-                return Ok(visitors);
+                var visitorDTOs = visitors.Select(v => new VisitorDTO
+                {
+                    FullName = v.FullName,
+                    GuestOf = v.GuestOf,
+                    OtherRemarks = v.OtherRemarks,
+                    DateEntered = v.DateEntered,
+                    OtherGuests = v.OtherGuests
+                });
+                return Ok(visitorDTOs);
             }
             catch (Exception ex)
             {

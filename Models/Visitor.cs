@@ -12,7 +12,7 @@ namespace Church.Models
         public string Id { get; set; }
 
         [BsonElement("Fullname")]
-        public string Fullname { get; set; }
+        public string FullName { get; set; }
 
         [BsonElement("GuestOf")]
         public string GuestOf { get; set; }

@@ -61,7 +61,7 @@ namespace Church.Services
 
             var currentRole = await _roleService.GetRoleById(currentUser.RoleId);
 
-            if (currentRole.Name != "Pastor" && currentRole.Name != "Deacon" && currentRole.Name != "Admin")
+            if (currentRole.Name != "Pastor" || currentRole.Name != "Deacon" || currentRole.Name != "Admin")
                 return false;
 
             user.RoleId = newRoleId;
