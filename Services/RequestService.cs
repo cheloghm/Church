@@ -39,5 +39,11 @@ namespace Church.Services
         {
             await _requestRepository.DeleteRequest(id);
         }
+
+        public async Task<IEnumerable<Request>> GetRequestsByDate(DateTime date)
+        {
+            return await _requestRepository.GetRequestsByDate(date);
+        }
+
     }
 }

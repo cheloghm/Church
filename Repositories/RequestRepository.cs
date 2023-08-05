@@ -1,4 +1,5 @@
 ﻿// RequestRepository.cs
+using Church.Data;
 using Church.Models;
 using Church.RepositoryInterfaces;
 using MongoDB.Driver;
@@ -8,38 +9,46 @@ namespace Church.Repositories
 {
     public class RequestRepository : IRequestRepository
     {
-        private readonly IMongoCollection<Request> _requests;
+        private readonly DataContext _context;
 
-        public RequestRepository(IMongoDatabase database)
+        public RequestRepository(DataContext context)
         {
-            _requests = database.GetCollection<Request>("Requests");
+            _context = context;
         }
 
         public async Task<Request> AddRequest(Request request)
         {
-            await _requests.InsertOneAsync(request);
+            await _context.Requests.InsertOneAsync(request);
             return request;
         }
 
         public async Task<Request> GetRequest(string id)
         {
-            return await _requests.Find(r => r.Id == id).FirstOrDefaultAsync();
+            return await _context.Requests.Find(r => r.Id == id).FirstOrDefaultAsync();
         }
 
         public async Task<IEnumerable<Request>> GetAllRequests()
         {
-            return await _requests.Find(r => true).ToListAsync();
+            return await _context.Requests.Find(r => true).ToListAsync();
         }
 
         public async Task<Request> UpdateRequest(Request request)
         {
-            await _requests.ReplaceOneAsync(r => r.Id == request.Id, request);
+            await _context.Requests.ReplaceOneAsync(r => r.Id == request.Id, request);
             return request;
         }
 
         public async Task DeleteRequest(string id)
         {
-            await _requests.DeleteOneAsync(r => r.Id == id);
+            await _context.Requests.DeleteOneAsync(r => r.Id == id);
         }
+
+        public async Task<IEnumerable<Request>> GetRequestsByDate(DateTime date)
+        {
+            return await _context.Requests
+                .Find(r => r.DateEntered.Date == date.Date)
+                .ToListAsync();
+        }
+
     }
 }

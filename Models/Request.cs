@@ -17,7 +17,7 @@ namespace Church.Models
         public string Title { get; set; }
 
         [BsonElement("Remarks")]
-        public string Remarks { get; set; }
+        public string OtherRemarks { get; set; }
 
         [BsonElement("DateEntered")]
         public DateTime DateEntered { get; set; }
