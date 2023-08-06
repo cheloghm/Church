@@ -85,7 +85,7 @@ namespace Church.Controllers
             return Ok();
         }
 
-        [HttpGet]
+        [HttpGet("by-date")]
         public IActionResult GetVisitorsByDate(DateTime date)
         {
             try
