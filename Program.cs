@@ -7,6 +7,8 @@ using Church.Mapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Microsoft.AspNetCore.Hosting;
+using AutoMapper;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,15 +33,13 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(builder.Configuration.GetSection("AppSettings:Secret").Value)),
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(builder.Configuration.GetSection("Jwt:Key").Value)), // Corrected path
             ValidateIssuer = false,
             ValidateAudience = false
         };
     });
 
-builder.Services.AddScoped<UserMapper>();
-builder.Services.AddScoped<VisitorMapper>();
-builder.Services.AddScoped<RequestMapper>();
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 // Add Swagger services
 builder.Services.AddSwaggerGen(c =>

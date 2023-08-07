@@ -3,21 +3,23 @@ using System.Threading.Tasks;
 using Church.ServiceInterfaces;
 using Church.DTO;
 using Church.Services;
+using AutoMapper;
 
 namespace Church.Controllers
 {
-
     [ApiController]
     [Route("api/[controller]")]
     public class AuthController : ControllerBase
     {
         private readonly IAuthService _authService;
         private readonly IRoleService _roleService;
+        private readonly IMapper _mapper;
 
-        public AuthController(IAuthService authService, IRoleService roleService)
+        public AuthController(IAuthService authService, IRoleService roleService, IMapper mapper)
         {
             _authService = authService;
             _roleService = roleService;
+            _mapper = mapper;
         }
 
         [HttpPost("register")]
@@ -31,19 +33,10 @@ namespace Church.Controllers
             var user = await _authService.Register(userAuthDto, memberRole.Id);
 
             if (user == null)
-                return BadRequest("Username is already taken");
+                return BadRequest("email is already taken");
 
-            // Map the user to the UserDTO
-            var userDto = new UserDTO
-            {
-                FirstName = user.FirstName,
-                MiddleName = user.MiddleName,
-                LastName = user.LastName,
-                Email = user.Email,
-                RoleId = user.RoleId,
-                DOB = user.DOB,
-                ProfilePhoto = null
-            };
+            // Map the user to the UserDTO using AutoMapper
+            var userDto = _mapper.Map<UserDTO>(user); // Modify this line
 
             return Ok(userDto);
         }

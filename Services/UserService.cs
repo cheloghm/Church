@@ -1,7 +1,10 @@
-﻿using Church.DTO;
-using Church.Mapper;
+﻿using AutoMapper;
+using Church.DTO;
 using Church.RepositoryInterfaces;
 using Church.ServiceInterfaces;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Church.Services
 {
@@ -10,39 +13,39 @@ namespace Church.Services
         private readonly IUserRepository _userRepository;
         private readonly IProfilePhotoService _profilePhotoService;
         private readonly IRoleService _roleService;
-        private readonly UserMapper _userMapper;
+        private readonly IMapper _mapper; // Use AutoMapper's IMapper interface
 
-        public UserService(IUserRepository userRepository, IProfilePhotoService profilePhotoService, IRoleService roleService, UserMapper userMapper)
+        public UserService(IUserRepository userRepository, IProfilePhotoService profilePhotoService, IRoleService roleService, IMapper mapper)
         {
             _userRepository = userRepository;
             _profilePhotoService = profilePhotoService;
             _roleService = roleService;
-            _userMapper = userMapper;
+            _mapper = mapper; // Inject AutoMapper
         }
 
         public async Task<UserDTO> GetUserDetails(string userId)
         {
             var user = await _userRepository.GetUserById(userId);
-            return _userMapper.MapToUserDTO(user);
+            return _mapper.Map<UserDTO>(user); // Use AutoMapper to map
         }
 
         public async Task<IEnumerable<UserDTO>> GetAllUsers()
         {
             var users = await _userRepository.GetAllUsers();
-            return users.Select(user => _userMapper.MapToUserDTO(user));
+            return _mapper.Map<IEnumerable<UserDTO>>(users); // Use AutoMapper to map
         }
 
         public async Task<IEnumerable<UserDTO>> GetUsersByRole(string roleName)
         {
             var role = await _roleService.GetRoleByName(roleName);
             var users = await _userRepository.GetUsersByRoleId(role.Id);
-            return users.Select(user => _userMapper.MapToUserDTO(user));
+            return _mapper.Map<IEnumerable<UserDTO>>(users); // Use AutoMapper to map
         }
 
         public async Task<IEnumerable<UserDTO>> SearchUsersByName(string name)
         {
             var users = await _userRepository.SearchUsersByName(name);
-            return users.Select(user => _userMapper.MapToUserDTO(user));
+            return _mapper.Map<IEnumerable<UserDTO>>(users); // Use AutoMapper to map
         }
 
         public async Task<UserDTO> UpdateUserProfile(string userId, UserDTO userDto)
@@ -52,11 +55,7 @@ namespace Church.Services
             if (user == null)
                 return null;
 
-            user.FirstName = userDto.FirstName;
-            user.MiddleName = userDto.MiddleName;
-            user.LastName = userDto.LastName;
-            userDto.DOB = userDto.DOB;
-            user.Email = userDto.Email;
+            _mapper.Map(userDto, user); // Use AutoMapper to map properties from DTO to user
 
             await _userRepository.UpdateUser(user);
 

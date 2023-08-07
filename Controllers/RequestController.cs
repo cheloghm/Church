@@ -1,4 +1,6 @@
-﻿using Church.DTO;
+﻿using Amazon.Runtime.Internal;
+using AutoMapper;
+using Church.DTO;
 using Church.Mapper;
 using Church.Models;
 using Church.ServiceInterfaces;
@@ -11,9 +13,9 @@ using Microsoft.AspNetCore.Mvc;
 public class RequestController : ControllerBase
 {
     private readonly IRequestService _requestService;
-    private readonly RequestMapper _requestMapper;
+    private readonly IMapper _requestMapper;
 
-    public RequestController(IRequestService requestService, RequestMapper requestMapper)
+    public RequestController(IRequestService requestService, IMapper requestMapper)
     {
         _requestService = requestService;
         _requestMapper = requestMapper;
@@ -24,7 +26,7 @@ public class RequestController : ControllerBase
     public async Task<ActionResult<IEnumerable<RequestDTO>>> GetAllRequests()
     {
         var requests = await _requestService.GetAllRequests();
-        return Ok(requests.Select(r => _requestMapper.MapToRequestDTO(r)));
+        return Ok(_requestMapper.Map<IEnumerable<RequestDTO>>(requests));
     }
 
     // GET: api/Request/5
@@ -38,7 +40,7 @@ public class RequestController : ControllerBase
             return NotFound();
         }
 
-        return _requestMapper.MapToRequestDTO(request);
+        return Ok(_requestMapper.Map<IEnumerable<RequestDTO>>(request));
     }
 
     // POST: api/Request
@@ -46,7 +48,7 @@ public class RequestController : ControllerBase
     public async Task<ActionResult<RequestDTO>> PostRequest(Request request)
     {
         await _requestService.AddRequest(request);
-        return CreatedAtAction("GetRequest", new { id = request.Id }, _requestMapper.MapToRequestDTO(request));
+        return CreatedAtAction("GetRequest", new { id = request.Id }, Ok(_requestMapper.Map<IEnumerable<RequestDTO>>(request)));
     }
 
     // DELETE: api/Request/5
@@ -68,6 +70,6 @@ public class RequestController : ControllerBase
             return NotFound();
         }
 
-        return Ok(requests.Select(r => _requestMapper.MapToRequestDTO(r)));
+        return Ok(requests.Select(r => Ok(_requestMapper.Map<IEnumerable<RequestDTO>>(r))));
     }
 }
