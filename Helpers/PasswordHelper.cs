@@ -38,7 +38,7 @@ namespace Church.Helpers
         public static string GenerateJwtToken<T>(T entity, IConfiguration configuration, string roleName) where T : class
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(configuration.GetSection("AppSettings:Secret").Value);
+            var key = Encoding.ASCII.GetBytes(configuration.GetSection("Jwt:Key").Value);
             var tokenDescriptor = new SecurityTokenDescriptor();
 
             var user = entity as User;
@@ -54,7 +54,7 @@ namespace Church.Helpers
             }
 
             tokenDescriptor.Expires = DateTime.UtcNow.AddDays(7);
-            tokenDescriptor.SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha512Signature);
+            tokenDescriptor.SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature);
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
         }
