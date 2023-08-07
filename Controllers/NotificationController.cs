@@ -3,6 +3,7 @@ using Church.ServiceInterfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace Church.Controllers
 {
@@ -18,9 +19,14 @@ namespace Church.Controllers
             _notificationService = notificationService;
         }
 
-        [HttpGet("{userId}")]
-        public async Task<IActionResult> GetNotifications(string userId)
+        [HttpGet]
+        public async Task<IActionResult> GetNotifications()
         {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized();
+
             var notifications = await _notificationService.GetNotifications(userId);
             return Ok(notifications);
         }
@@ -28,6 +34,9 @@ namespace Church.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateNotification(NotificationDTO notificationDto)
         {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            notificationDto.UserId = userId; // Assuming NotificationDTO has a UserId property
+
             var notification = await _notificationService.CreateNotification(notificationDto);
             return Ok(notification);
         }

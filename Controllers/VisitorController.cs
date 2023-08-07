@@ -7,9 +7,7 @@ using Church.Models;
 using Church.ServiceInterfaces;
 using Church.DTO;
 using Microsoft.AspNetCore.Authorization;
-using Church.Mapper;
 using AutoMapper;
-using Amazon.Runtime.Internal;
 
 namespace Church.Controllers
 {
@@ -30,29 +28,41 @@ namespace Church.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<VisitorDTO>>> GetAllVisitors()
         {
+            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            // You can now use userId to filter or perform actions based on the authenticated user
+
             var visitors = await _visitorService.GetAllVisitors();
-            return Ok(visitors.Select(v => Ok(_visitorMapper.Map<IEnumerable<RequestDTO>>(visitors))));
+            return Ok(_visitorMapper.Map<IEnumerable<VisitorDTO>>(visitors));
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<VisitorDTO>> GetVisitor(string id)
         {
+            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            // You can now use userId to filter or perform actions based on the authenticated user
+
             var visitor = await _visitorService.GetVisitor(id);
             if (visitor == null) return NotFound();
-            return Ok(_visitorMapper.Map<IEnumerable<RequestDTO>>(visitor));
+            return Ok(_visitorMapper.Map<VisitorDTO>(visitor)); // Corrected the mapping
         }
 
         [HttpPost]
         public async Task<ActionResult<VisitorDTO>> PostVisitor(Visitor visitor)
         {
+            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            // You can now use userId to filter or perform actions based on the authenticated user
+
             await _visitorService.AddVisitor(visitor);
-            return CreatedAtAction("GetVisitor", new { id = visitor.Id }, Ok(_visitorMapper.Map<IEnumerable<RequestDTO>>(visitor)));
+            return CreatedAtAction("GetVisitor", new { id = visitor.Id }, _visitorMapper.Map<VisitorDTO>(visitor)); // Corrected the mapping
         }
 
         // DELETE: api/Visitor/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteVisitor(string id)
         {
+            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            // You can now use userId to filter or perform actions based on the authenticated user
+
             await _visitorService.DeleteVisitor(id);
             return Ok();
         }
@@ -62,8 +72,11 @@ namespace Church.Controllers
         {
             try
             {
+                var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+                // You can now use userId to filter or perform actions based on the authenticated user
+
                 var visitors = _visitorService.GetVisitorsByDate(date);
-                var visitorDTOs = visitors.Select(v => Ok(_visitorMapper.Map<IEnumerable<RequestDTO>>(visitors))); // Using the mapper here
+                var visitorDTOs = visitors.Select(v => _visitorMapper.Map<VisitorDTO>(v)); // Using the mapper here
                 return Ok(visitorDTOs);
             }
             catch (Exception ex)
@@ -72,7 +85,6 @@ namespace Church.Controllers
                 return StatusCode(500, "Internal server error");
             }
         }
-
 
     }
 }

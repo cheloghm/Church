@@ -6,6 +6,9 @@ using Church.Models;
 using Church.ServiceInterfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 [Authorize]
 [Route("api/[controller]")]
@@ -29,11 +32,16 @@ public class RequestController : ControllerBase
         return Ok(_requestMapper.Map<IEnumerable<RequestDTO>>(requests));
     }
 
-    // GET: api/Request/5
-    [HttpGet("{id}")]
-    public async Task<ActionResult<RequestDTO>> GetRequest(string id)
+    // GET: api/Request
+    [HttpGet]
+    public async Task<ActionResult<RequestDTO>> GetRequest()
     {
-        var request = await _requestService.GetRequest(id);
+        var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+        if (string.IsNullOrEmpty(userId))
+            return Unauthorized();
+
+        var request = await _requestService.GetRequest(userId);
 
         if (request == null)
         {
@@ -47,15 +55,27 @@ public class RequestController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<RequestDTO>> PostRequest(Request request)
     {
+        var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+        if (string.IsNullOrEmpty(userId))
+            return Unauthorized();
+
+        request.UserId = userId; // Assuming Request has a UserId property
+
         await _requestService.AddRequest(request);
         return CreatedAtAction("GetRequest", new { id = request.Id }, Ok(_requestMapper.Map<IEnumerable<RequestDTO>>(request)));
     }
 
-    // DELETE: api/Request/5
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteRequest(string id)
+    // DELETE: api/Request
+    [HttpDelete]
+    public async Task<IActionResult> DeleteRequest()
     {
-        await _requestService.DeleteRequest(id);
+        var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+        if (string.IsNullOrEmpty(userId))
+            return Unauthorized();
+
+        await _requestService.DeleteRequest(userId);
         return Ok();
     }
 

@@ -2,6 +2,7 @@
 using Church.ServiceInterfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 
 namespace Church.Controllers
 {
@@ -17,10 +18,15 @@ namespace Church.Controllers
             _userService = userService;
         }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateUserProfile(string id, UserDTO userDto)
+        [HttpPut]
+        public async Task<IActionResult> UpdateUserProfile(UserDTO userDto)
         {
-            var updatedUser = await _userService.UpdateUserProfile(id, userDto);
+            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized();
+
+            var updatedUser = await _userService.UpdateUserProfile(userId, userDto);
 
             if (updatedUser == null)
                 return NotFound();

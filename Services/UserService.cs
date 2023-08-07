@@ -55,7 +55,7 @@ namespace Church.Services
             if (user == null)
                 return null;
 
-            _mapper.Map(userDto, user); // Use AutoMapper to map properties from DTO to user
+            _mapper.Map(userDto, user);
 
             await _userRepository.UpdateUser(user);
 

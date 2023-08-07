@@ -1,6 +1,7 @@
 ﻿using Church.ServiceInterfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 
 namespace Church.Controllers
 {
@@ -17,17 +18,27 @@ namespace Church.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddProfilePhoto([FromBody] byte[] photo, string userId)
+        public async Task<IActionResult> AddProfilePhoto([FromBody] byte[] photo)
         {
+            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized();
+
             await _profilePhotoService.DeleteProfilePhotoByUserId(userId);
 
             var profilePhoto = await _profilePhotoService.AddProfilePhoto(photo, userId);
             return Ok(profilePhoto);
         }
 
-        [HttpGet("{userId}")]
-        public async Task<IActionResult> GetProfilePhotoByUserId(string userId)
+        [HttpGet]
+        public async Task<IActionResult> GetProfilePhotoByUserId()
         {
+            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized();
+
             var profilePhoto = await _profilePhotoService.GetProfilePhotoByUserId(userId);
 
             if (profilePhoto == null)
