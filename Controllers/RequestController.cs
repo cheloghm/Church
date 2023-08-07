@@ -1,94 +1,73 @@
-﻿using Church.Models;
+﻿using Church.DTO;
+using Church.Mapper;
+using Church.Models;
 using Church.ServiceInterfaces;
-using Church.DTO;
-using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
-namespace Church.Controllers
+[Authorize]
+[Route("api/[controller]")]
+[ApiController]
+public class RequestController : ControllerBase
 {
-    [Authorize]
-    [Route("api/[controller]")]
-    [ApiController]
-    public class RequestController : ControllerBase
+    private readonly IRequestService _requestService;
+    private readonly RequestMapper _requestMapper;
+
+    public RequestController(IRequestService requestService, RequestMapper requestMapper)
     {
-        private readonly IRequestService _requestService;
+        _requestService = requestService;
+        _requestMapper = requestMapper;
+    }
 
-        public RequestController(IRequestService requestService)
+    // GET: api/Request
+    [HttpGet]
+    public async Task<ActionResult<IEnumerable<RequestDTO>>> GetAllRequests()
+    {
+        var requests = await _requestService.GetAllRequests();
+        return Ok(requests.Select(r => _requestMapper.MapToRequestDTO(r)));
+    }
+
+    // GET: api/Request/5
+    [HttpGet("{id}")]
+    public async Task<ActionResult<RequestDTO>> GetRequest(string id)
+    {
+        var request = await _requestService.GetRequest(id);
+
+        if (request == null)
         {
-            _requestService = requestService;
+            return NotFound();
         }
 
-        // GET: api/Request
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<RequestDTO>>> GetAllRequests()
+        return _requestMapper.MapToRequestDTO(request);
+    }
+
+    // POST: api/Request
+    [HttpPost]
+    public async Task<ActionResult<RequestDTO>> PostRequest(Request request)
+    {
+        await _requestService.AddRequest(request);
+        return CreatedAtAction("GetRequest", new { id = request.Id }, _requestMapper.MapToRequestDTO(request));
+    }
+
+    // DELETE: api/Request/5
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteRequest(string id)
+    {
+        await _requestService.DeleteRequest(id);
+        return Ok();
+    }
+
+    // GET: api/Request/Date/{date}
+    [HttpGet("Date/{date}")]
+    public async Task<ActionResult<IEnumerable<RequestDTO>>> GetRequestsByDate(DateTime date)
+    {
+        var requests = await _requestService.GetRequestsByDate(date);
+
+        if (requests == null)
         {
-            var requests = await _requestService.GetAllRequests();
-            return Ok(requests);
+            return NotFound();
         }
 
-        // GET: api/Request/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<RequestDTO>> GetRequest(string id)
-        {
-            var request = await _requestService.GetRequest(id);
-
-            if (request == null)
-            {
-                return NotFound();
-            }
-
-            return new RequestDTO
-            {
-                NameOfRequestor = request.NameOfRequestor,
-                Title = request.Title,
-                OtherRemarks = request.OtherRemarks,
-                DateEntered = request.DateEntered
-            };
-        }
-
-        // POST: api/Request
-        [HttpPost]
-        public async Task<ActionResult<RequestDTO>> PostRequest(Request request)
-        {
-            await _requestService.AddRequest(request);
-
-            return CreatedAtAction("GetRequest", new { id = request.Id }, new RequestDTO
-            {
-                NameOfRequestor = request.NameOfRequestor,
-                Title = request.Title,
-                OtherRemarks = request.OtherRemarks,
-                DateEntered = request.DateEntered
-            });
-        }
-
-        // DELETE: api/Request/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteRequest(string id)
-        {
-            await _requestService.DeleteRequest(id);
-            return Ok();
-        }
-
-        // GET: api/Request/Date/{date}
-        [HttpGet("Date/{date}")]
-        public async Task<ActionResult<IEnumerable<RequestDTO>>> GetRequestsByDate(DateTime date)
-        {
-            var requests = await _requestService.GetRequestsByDate(date);
-
-            if (requests == null)
-            {
-                return NotFound();
-            }
-
-            return Ok(requests.Select(r => new RequestDTO
-            {
-                NameOfRequestor = r.NameOfRequestor,
-                Title = r.Title,
-                OtherRemarks = r.OtherRemarks,
-                DateEntered = r.DateEntered
-            }));
-        }
-
+        return Ok(requests.Select(r => _requestMapper.MapToRequestDTO(r)));
     }
 }

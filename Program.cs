@@ -39,6 +39,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddScoped<UserMapper>();
 builder.Services.AddScoped<VisitorMapper>();
+builder.Services.AddScoped<RequestMapper>();
 
 // Add Swagger services
 builder.Services.AddSwaggerGen(c =>
