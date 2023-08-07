@@ -3,6 +3,7 @@ using Church.Extensions;
 using Church.Middlewares;
 using MongoDB.Driver;
 using Microsoft.OpenApi.Models;
+using Church.Mapper;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,6 +21,8 @@ builder.Services.AddScoped<DataContext>(sp =>
     var configuration = sp.GetRequiredService<IConfiguration>();
     return new DataContext(configuration);
 });
+
+builder.Services.AddScoped<UserMapper>();
 
 // Add Swagger services
 builder.Services.AddSwaggerGen(c =>
