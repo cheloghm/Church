@@ -6,6 +6,7 @@ using System.Security.Claims;
 
 namespace Church.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class NotificationController : ControllerBase

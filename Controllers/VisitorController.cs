@@ -6,9 +6,11 @@ using Microsoft.AspNetCore.Mvc;
 using Church.Models;
 using Church.ServiceInterfaces;
 using Church.DTO;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Church.Controllers
 {
+    [Authorize(Roles = "Admin,Pastor,Deacon")]
     [Route("api/[controller]")]
     [ApiController]
     public class VisitorController : ControllerBase

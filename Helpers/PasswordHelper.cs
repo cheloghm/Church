@@ -6,6 +6,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.Extensions.Configuration;
 using System;
+using Church.Services;
 
 namespace Church.Helpers
 {
@@ -34,7 +35,7 @@ namespace Church.Helpers
             return true;
         }
 
-        public static string GenerateJwtToken<T>(T entity, IConfiguration configuration) where T : class
+        public static string GenerateJwtToken<T>(T entity, IConfiguration configuration, string roleName) where T : class
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(configuration.GetSection("AppSettings:Secret").Value);
@@ -43,11 +44,13 @@ namespace Church.Helpers
             var user = entity as User;
             if (user != null)
             {
-                tokenDescriptor.Subject = new ClaimsIdentity(new Claim[]
-                {
-                    new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                    new Claim(ClaimTypes.Email, user.Email)
-                });
+                var claims = new List<Claim>
+        {
+            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+            new Claim(ClaimTypes.Email, user.Email),
+            new Claim(ClaimTypes.Role, roleName)
+        };
+                tokenDescriptor.Subject = new ClaimsIdentity(claims);
             }
 
             tokenDescriptor.Expires = DateTime.UtcNow.AddDays(7);

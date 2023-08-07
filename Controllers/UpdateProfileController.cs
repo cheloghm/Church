@@ -1,9 +1,11 @@
 ﻿using Church.DTO;
 using Church.ServiceInterfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Church.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class UpdateProfileController : ControllerBase

@@ -3,6 +3,7 @@ using Church.Helpers;
 using Church.Models;
 using Church.ServiceInterfaces;
 using Church.RepositoryInterfaces;
+using Microsoft.Extensions.Configuration;
 
 namespace Church.Services
 {
@@ -10,11 +11,13 @@ namespace Church.Services
     {
         private readonly IAuthRepository _authRepository;
         private readonly IConfiguration _configuration;
+        private readonly IRoleService _roleService;
 
-        public AuthService(IAuthRepository authRepository, IConfiguration configuration)
+        public AuthService(IAuthRepository authRepository, IConfiguration configuration, IRoleService roleService)
         {
             _authRepository = authRepository;
             _configuration = configuration;
+            _roleService = roleService;
         }
 
         public async Task<User> Register(UserAuthDTO userAuthDto, string roleId)
@@ -48,7 +51,9 @@ namespace Church.Services
             if (!PasswordHelper.VerifyPasswordHash(userAuthDto.Password, user.PasswordHash, user.PasswordSalt))
                 return null;
 
-            return PasswordHelper.GenerateJwtToken(user, _configuration);
+            var roleName = _roleService.GetRoleById(user.RoleId).Result.Name;
+            var token = PasswordHelper.GenerateJwtToken(user, _configuration, roleName);
+            return token;
         }
 
         public async Task<string> GeneratePasswordRecoveryToken(string email)

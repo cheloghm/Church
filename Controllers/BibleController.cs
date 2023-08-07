@@ -1,9 +1,11 @@
 ﻿using Church.ServiceInterfaces;
 using Church.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Church.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class BibleController : ControllerBase
