@@ -38,15 +38,16 @@ builder.Services.AddMyServices();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 app.UseHttpsRedirection();
-
 app.UseSwagger();
 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Church v1"));
-app.UseHttpsRedirection();
-// Other middlewares
-
-app.UseMiddleware<ExceptionMiddleware>();
+app.UseRouting(); // <-- Make sure to include this
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseMiddleware<LoggingMiddleware>();
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllers(); // <-- Make sure to include this
+});
+
 
 app.Run();

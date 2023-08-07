@@ -33,8 +33,21 @@ namespace Church.Controllers
             if (user == null)
                 return BadRequest("Username is already taken");
 
-            return Ok(user);
+            // Map the user to the UserDTO
+            var userDto = new UserDTO
+            {
+                FirstName = user.FirstName,
+                MiddleName = user.MiddleName,
+                LastName = user.LastName,
+                Email = user.Email,
+                RoleId = user.RoleId,
+                DOB = user.DOB,
+                ProfilePhoto = null
+            };
+
+            return Ok(userDto);
         }
+
 
         [HttpPost("login")]
         public async Task<IActionResult> Login(UserAuthDTO userAuthDto)

@@ -1,4 +1,5 @@
 ﻿using Church.DTO;
+using Church.Mapper;
 using Church.RepositoryInterfaces;
 using Church.ServiceInterfaces;
 
@@ -9,28 +10,39 @@ namespace Church.Services
         private readonly IUserRepository _userRepository;
         private readonly IProfilePhotoService _profilePhotoService;
         private readonly IRoleService _roleService;
+        private readonly UserMapper _userMapper;
 
-        public UserService(IUserRepository userRepository, IProfilePhotoService profilePhotoService, IRoleService roleService)
+        public UserService(IUserRepository userRepository, IProfilePhotoService profilePhotoService, IRoleService roleService, UserMapper userMapper)
         {
             _userRepository = userRepository;
             _profilePhotoService = profilePhotoService;
             _roleService = roleService;
+            _userMapper = userMapper;
         }
 
         public async Task<UserDTO> GetUserDetails(string userId)
         {
             var user = await _userRepository.GetUserById(userId);
-            var profilePhoto = await _profilePhotoService.GetProfilePhotoByUserId(userId);
-            var role = await _roleService.GetRoleById(user.RoleId);
+            return _userMapper.MapToUserDTO(user);
+        }
 
-            return new UserDTO
-            {
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                Email = user.Email,
-                RoleId = role.Name,
-                ProfilePhoto = profilePhoto.Photo
-            };
+        public async Task<IEnumerable<UserDTO>> GetAllUsers()
+        {
+            var users = await _userRepository.GetAllUsers();
+            return users.Select(user => _userMapper.MapToUserDTO(user));
+        }
+
+        public async Task<IEnumerable<UserDTO>> GetUsersByRole(string roleName)
+        {
+            var role = await _roleService.GetRoleByName(roleName);
+            var users = await _userRepository.GetUsersByRoleId(role.Id);
+            return users.Select(user => _userMapper.MapToUserDTO(user));
+        }
+
+        public async Task<IEnumerable<UserDTO>> SearchUsersByName(string name)
+        {
+            var users = await _userRepository.SearchUsersByName(name);
+            return users.Select(user => _userMapper.MapToUserDTO(user));
         }
 
         public async Task<UserDTO> UpdateUserProfile(string userId, UserDTO userDto)
