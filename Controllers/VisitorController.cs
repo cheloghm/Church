@@ -7,6 +7,7 @@ using Church.Models;
 using Church.ServiceInterfaces;
 using Church.DTO;
 using Microsoft.AspNetCore.Authorization;
+using Church.Mapper;
 
 namespace Church.Controllers
 {
@@ -16,67 +17,34 @@ namespace Church.Controllers
     public class VisitorController : ControllerBase
     {
         private readonly IVisitorService _visitorService;
+        private readonly VisitorMapper _visitorMapper;
 
-        public VisitorController(IVisitorService visitorService)
+        public VisitorController(IVisitorService visitorService, VisitorMapper visitorMapper)
         {
             _visitorService = visitorService;
+            _visitorMapper = visitorMapper;
         }
 
-        // GET: api/Visitor
         [HttpGet]
         public async Task<ActionResult<IEnumerable<VisitorDTO>>> GetAllVisitors()
         {
             var visitors = await _visitorService.GetAllVisitors();
-            return Ok(visitors.Select(v => new VisitorDTO
-            {
-                FullName = v.FullName,
-                GuestOf = v.GuestOf,
-                OtherRemarks = v.OtherRemarks,
-                DateEntered = v.DateEntered,
-                OtherGuests = v.OtherGuests
-            }));
+            return Ok(visitors.Select(v => _visitorMapper.MapToVisitorDTO(v)));
         }
 
-
-        // GET: api/Visitor/5
         [HttpGet("{id}")]
         public async Task<ActionResult<VisitorDTO>> GetVisitor(string id)
         {
             var visitor = await _visitorService.GetVisitor(id);
-
-            if (visitor == null)
-            {
-                return NotFound();
-            }
-
-            var visitorDTO = new VisitorDTO
-            {
-                FullName = visitor.FullName,
-                GuestOf = visitor.GuestOf,
-                OtherRemarks = visitor.OtherRemarks,
-                DateEntered = visitor.DateEntered,
-                OtherGuests = visitor.OtherGuests
-            };
-
-            return visitorDTO;
+            if (visitor == null) return NotFound();
+            return _visitorMapper.MapToVisitorDTO(visitor);
         }
 
-        // POST: api/Visitor
         [HttpPost]
         public async Task<ActionResult<VisitorDTO>> PostVisitor(Visitor visitor)
         {
             await _visitorService.AddVisitor(visitor);
-
-            var visitorDTO = new VisitorDTO
-            {
-                FullName = visitor.FullName,
-                GuestOf = visitor.GuestOf,
-                OtherRemarks = visitor.OtherRemarks,
-                DateEntered = visitor.DateEntered,
-                OtherGuests = visitor.OtherGuests
-            };
-
-            return CreatedAtAction("GetVisitor", new { id = visitor.Id }, visitorDTO);
+            return CreatedAtAction("GetVisitor", new { id = visitor.Id }, _visitorMapper.MapToVisitorDTO(visitor));
         }
 
         // DELETE: api/Visitor/5
@@ -93,14 +61,7 @@ namespace Church.Controllers
             try
             {
                 var visitors = _visitorService.GetVisitorsByDate(date);
-                var visitorDTOs = visitors.Select(v => new VisitorDTO
-                {
-                    FullName = v.FullName,
-                    GuestOf = v.GuestOf,
-                    OtherRemarks = v.OtherRemarks,
-                    DateEntered = v.DateEntered,
-                    OtherGuests = v.OtherGuests
-                });
+                var visitorDTOs = visitors.Select(v => _visitorMapper.MapToVisitorDTO(v)); // Using the mapper here
                 return Ok(visitorDTOs);
             }
             catch (Exception ex)
@@ -109,6 +70,7 @@ namespace Church.Controllers
                 return StatusCode(500, "Internal server error");
             }
         }
+
 
     }
 }
