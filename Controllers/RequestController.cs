@@ -32,8 +32,8 @@ public class RequestController : ControllerBase
         return Ok(_requestMapper.Map<IEnumerable<RequestDTO>>(requests));
     }
 
-    // GET: api/Request
-    [HttpGet]
+    // GET: api/Request/id
+    [HttpGet("{id}")]
     public async Task<ActionResult<RequestDTO>> GetRequest()
     {
         var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
