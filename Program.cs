@@ -33,7 +33,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(builder.Configuration.GetSection("Jwt:Key").Value)), // Corrected path
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(builder.Configuration.GetSection("Jwt:Key").Value)),
             ValidateIssuer = false,
             ValidateAudience = false
         };
@@ -45,10 +45,32 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "Church", Version = "v1" });
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Description = "JWT Authorization header using the Bearer scheme. Enter 'Bearer' [space] and then your token in the text input below.",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer"
+    });
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            new string[] { }
+        }
+    });
 });
 
 // Add HttpClient
-builder.Services.AddHttpClient(); // <-- Add this line
+builder.Services.AddHttpClient();
 
 // Add MVC services
 builder.Services.AddControllers();
@@ -58,20 +80,19 @@ builder.Services.AddMyServices();
 
 var app = builder.Build();
 
-app.UseAuthentication();
-app.UseAuthorization();
-
+// Order of middleware is important
 app.UseHttpsRedirection();
 app.UseSwagger();
 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Church v1"));
-app.UseRouting();
+app.UseRouting(); // Routing must come first
+app.UseAuthentication(); // Then authentication
+app.UseAuthorization(); // Then authorization
 app.UseMiddleware<RoleValidationMiddleware>();
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseMiddleware<LoggingMiddleware>();
 app.UseEndpoints(endpoints =>
 {
-    endpoints.MapControllers(); // <-- Make sure to include this
+    endpoints.MapControllers();
 });
-
 
 app.Run();

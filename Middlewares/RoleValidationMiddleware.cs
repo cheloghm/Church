@@ -18,8 +18,8 @@ namespace Church.Middlewares
 
             if (user.Identity.IsAuthenticated)
             {
-                var userRoleId = user.FindFirstValue(ClaimTypes.Role);
-                var userRole = await roleService.GetRoleById(userRoleId);
+                var userRoleName = user.FindFirstValue(ClaimTypes.Role);
+                var userRole = await roleService.GetRoleByName(userRoleName); // Use GetRoleByName method
 
                 if (userRole == null)
                 {
@@ -31,6 +31,6 @@ namespace Church.Middlewares
 
             await _next(context);
         }
-
     }
+
 }

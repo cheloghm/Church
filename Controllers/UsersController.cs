@@ -19,7 +19,7 @@ namespace Church.Controllers
             _userService = userService;
         }
 
-        [Authorize(Roles = "Admin,Pastor,Deacon")]
+        [Authorize(Roles = "Admin,Pastor,Deacon,Member")]
         [HttpGet]
         public async Task<IActionResult> GetAllUsers()
         {
