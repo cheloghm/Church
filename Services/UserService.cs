@@ -26,7 +26,12 @@ namespace Church.Services
         public async Task<UserDTO> GetUserDetails(string userId)
         {
             var user = await _userRepository.GetUserById(userId);
-            return _mapper.Map<UserDTO>(user); // Use AutoMapper to map
+            var profilePhoto = await _profilePhotoService.GetProfilePhotoByUserId(userId); // Fetch the profile photo
+
+            var userDto = _mapper.Map<UserDTO>(user);
+            userDto.ProfilePhoto = profilePhoto?.Photo; // Assign the profile photo to the DTO
+
+            return userDto; // Use AutoMapper to map
         }
 
         public async Task<IEnumerable<UserDTO>> GetAllUsers()

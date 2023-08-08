@@ -21,5 +21,8 @@ namespace Church.Models
 
         [BsonElement("DateEntered")]
         public DateTime DateEntered { get; set; }
+
+        [BsonElement("UserId")] // Add this property
+        public string UserId { get; set; }
     }
 }
