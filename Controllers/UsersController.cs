@@ -31,12 +31,12 @@ namespace Church.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetUserDetails(string id)
+        public async Task<IActionResult> GetUserDetails()
         {
             var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
             // You can now use userId to filter or perform actions based on the authenticated user
 
-            var userDto = await _userService.GetUserDetails(id);
+            var userDto = await _userService.GetUserDetails(userId);
 
             if (userDto == null)
                 return NotFound();
