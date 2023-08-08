@@ -13,7 +13,8 @@ namespace Church.Mapper
             CreateMap<Request, RequestDTO>();
             CreateMap<RequestDTO, Request>();
 
-            CreateMap<User, UserDTO>();
+            CreateMap<User, UserDTO>()
+                .ForMember(dest => dest.Role, opt => opt.Ignore());
             CreateMap<UserDTO, User>();
 
             CreateMap<Visitor, VisitorDTO>();
