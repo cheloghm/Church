@@ -20,18 +20,22 @@ namespace Church.Services
             _roleService = roleService;
         }
 
-        public async Task<User> Register(UserAuthDTO userAuthDto, string roleId)
+        public async Task<User> Register(RegisterDTO registerDto, string roleId)
         {
-            if (await _authRepository.UserExists(userAuthDto.Email))
+            if (await _authRepository.UserExists(registerDto.Email))
                 return null;
 
             var user = new User
             {
-                Email = userAuthDto.Email,
+                FirstName = registerDto.FirstName,
+                MiddleName = registerDto.MiddleName,
+                LastName = registerDto.LastName,
+                Email = registerDto.Email,
+                DOB = registerDto.DOB,
                 RoleId = roleId
             };
 
-            PasswordHelper.CreatePasswordHash(userAuthDto.Password, out byte[] passwordHash, out byte[] passwordSalt);
+            PasswordHelper.CreatePasswordHash(registerDto.Password, out byte[] passwordHash, out byte[] passwordSalt);
 
             user.PasswordHash = passwordHash;
             user.PasswordSalt = passwordSalt;

@@ -31,15 +31,44 @@ namespace Church.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetUserDetails()
+        public async Task<IActionResult> GetUserDetails(string id)
         {
             var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
             // You can now use userId to filter or perform actions based on the authenticated user
 
+            if (string.IsNullOrEmpty(userId))
+            {
+                var userDto = await _userService.GetUserDetails(id);
+
+                if (userDto == null)
+                    return NotFound();
+
+                return Ok(userDto);
+            }
+            return null;
+            
+        }
+
+        [HttpGet("me")]
+        public async Task<IActionResult> GetMyDetails()
+        {
+            // Get the user's ID from the claims
+            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+            // Check if the user ID is available
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized();
+            }
+
+            // Get the user details using the user ID
             var userDto = await _userService.GetUserDetails(userId);
 
+            // Check if the user details are available
             if (userDto == null)
+            {
                 return NotFound();
+            }
 
             return Ok(userDto);
         }

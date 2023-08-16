@@ -23,14 +23,14 @@ namespace Church.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<IActionResult> Register(UserAuthDTO userAuthDto)
+        public async Task<IActionResult> Register(RegisterDTO registerDto)
         {
             var memberRole = await _roleService.GetRoleByName("Member");
 
             if (memberRole == null)
                 return BadRequest("Member role does not exist");
 
-            var user = await _authService.Register(userAuthDto, memberRole.Id);
+            var user = await _authService.Register(registerDto, memberRole.Id);
 
             if (user == null)
                 return BadRequest("email is already taken");
