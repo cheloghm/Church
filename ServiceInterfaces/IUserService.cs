@@ -10,7 +10,7 @@ namespace Church.ServiceInterfaces
         Task<IEnumerable<UserDTO>> GetAllUsers();
         Task<IEnumerable<UserDTO>> GetUsersByRole(string roleId);
         Task<IEnumerable<UserDTO>> SearchUsersByName(string name);
-        Task<UserDTO> UpdateUserProfile(string userId, UserDTO userDto);
+        Task<UserDTO> UpdateUserProfile(string userId, UpdateUserDTO userDto);
         Task<bool> ChangeUserRole(string userId, string newRoleId, string currentUserId);
     }
 }

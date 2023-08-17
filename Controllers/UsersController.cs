@@ -79,7 +79,10 @@ namespace Church.Controllers
         {
             var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
             // You can now use userId to filter or perform actions based on the authenticated user
-
+            if (userId == null)
+            {
+                return NotFound();
+            }
             var userDtos = await _userService.GetUsersByRole(roleName);
             return Ok(userDtos);
         }

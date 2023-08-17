@@ -17,6 +17,8 @@ namespace Church.Mapper
                 .ForMember(dest => dest.Role, opt => opt.Ignore());
             CreateMap<UserDTO, User>();
 
+            CreateMap<UpdateUserDTO, User>();
+
             CreateMap<Visitor, VisitorDTO>();
             CreateMap<VisitorDTO, Visitor>();
         }

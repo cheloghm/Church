@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Church.DTO;
+using Church.Models;
 using Church.RepositoryInterfaces;
 using Church.ServiceInterfaces;
 using System.Collections.Generic;
@@ -75,7 +76,7 @@ namespace Church.Services
             return await Task.WhenAll(userDtos); // Wait for all tasks to complete
         }
 
-        public async Task<UserDTO> UpdateUserProfile(string userId, UserDTO userDto)
+        public async Task<UserDTO> UpdateUserProfile(string userId, UpdateUserDTO userDto)
         {
             var user = await _userRepository.GetUserById(userId);
 
@@ -86,10 +87,11 @@ namespace Church.Services
 
             await _userRepository.UpdateUser(user);
 
-            var role = await _roleService.GetRoleById(user.RoleId); // Fetch the role using RoleId
-            userDto.Role = role?.Name; // Assign the role name to the DTO
+            var updatedUserDto = _mapper.Map<UserDTO>(user);
+            var role = await _roleService.GetRoleById(user.RoleId);
+            updatedUserDto.Role = role?.Name;
 
-            return userDto;
+            return updatedUserDto;
         }
 
         public async Task<bool> ChangeUserRole(string userId, string newRoleId, string currentUserId)

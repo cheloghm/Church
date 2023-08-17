@@ -19,7 +19,7 @@ namespace Church.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpdateUserProfile(UserDTO userDto)
+        public async Task<IActionResult> UpdateUserProfile(UpdateUserDTO userDto)
         {
             var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
 
@@ -33,5 +33,6 @@ namespace Church.Controllers
 
             return Ok(updatedUser);
         }
+
     }
 }
