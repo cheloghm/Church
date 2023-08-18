@@ -75,6 +75,17 @@ namespace Church.Controllers
             return Ok();
         }
 
+        [HttpGet("undeactivated")]
+        public async Task<IActionResult> GetUndeactivatedNotifications()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized();
+
+            var notifications = await _notificationService.GetUndeactivatedNotifications(userId);
+            return Ok(notifications);
+        }
 
     }
 

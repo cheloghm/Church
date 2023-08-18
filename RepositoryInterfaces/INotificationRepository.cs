@@ -10,6 +10,8 @@ namespace Church.RepositoryInterfaces
         Task DeactivateNotification(string notificationId);
         Task<Notification> GetNotificationById(string notificationId);
         Task UpdateNotification(Notification notification);
+        Task<IEnumerable<Notification>> GetUndeactivatedNotifications(string userId);
+
     }
 
 }

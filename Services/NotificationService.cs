@@ -71,6 +71,11 @@ namespace Church.Services
             await _notificationRepository.UpdateNotification(notification);
         }
 
+        public async Task<IEnumerable<Notification>> GetUndeactivatedNotifications(string userId)
+        {
+            return await _notificationRepository.GetUndeactivatedNotifications(userId);
+        }
+
     }
 
 }

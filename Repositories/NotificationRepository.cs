@@ -50,6 +50,15 @@ namespace Church.Repositories
             await _context.Notifications.ReplaceOneAsync(filter, notification);
         }
 
+        public async Task<IEnumerable<Notification>> GetUndeactivatedNotifications(string userId)
+        {
+            var filter = Builders<Notification>.Filter.And(
+                Builders<Notification>.Filter.Eq(n => n.UserId, userId),
+                Builders<Notification>.Filter.Eq(n => n.IsActive, true)
+            );
+            return await _context.Notifications.Find(filter).ToListAsync();
+        }
+
     }
 
 }
