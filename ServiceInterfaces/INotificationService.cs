@@ -9,6 +9,9 @@ namespace Church.ServiceInterfaces
         Task<Notification> CreateNotification(NotificationDTO notificationDto);
         Task MarkAsRead(string notificationId);
         Task DeactivateNotification(string notificationId, string userId);
+        Task<Notification> GetNotificationById(string notificationId);
+        Task UpdateNotification(Notification notification);
+
     }
 
 }

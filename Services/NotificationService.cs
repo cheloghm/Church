@@ -54,6 +54,23 @@ namespace Church.Services
                 throw new UnauthorizedAccessException("You do not have permission to deactivate this notification.");
             }
         }
+
+        public async Task<Notification> GetNotificationById(string notificationId)
+        {
+            var notification = await _notificationRepository.GetNotificationById(notificationId);
+            if (notification != null && !notification.IsRead)
+            {
+                notification.IsRead = true;
+                await _notificationRepository.UpdateNotification(notification);
+            }
+            return notification;
+        }
+
+        public async Task UpdateNotification(Notification notification)
+        {
+            await _notificationRepository.UpdateNotification(notification);
+        }
+
     }
 
 }

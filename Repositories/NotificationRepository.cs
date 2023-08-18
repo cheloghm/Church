@@ -38,6 +38,18 @@ namespace Church.Repositories
             var update = Builders<Notification>.Update.Set(n => n.IsActive, false);
             await _context.Notifications.UpdateOneAsync(filter, update);
         }
+
+        public async Task<Notification> GetNotificationById(string notificationId)
+        {
+            return await _context.Notifications.Find(n => n.Id == notificationId).FirstOrDefaultAsync();
+        }
+
+        public async Task UpdateNotification(Notification notification)
+        {
+            var filter = Builders<Notification>.Filter.Eq(n => n.Id, notification.Id);
+            await _context.Notifications.ReplaceOneAsync(filter, notification);
+        }
+
     }
 
 }

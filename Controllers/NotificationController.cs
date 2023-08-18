@@ -1,4 +1,5 @@
 ﻿using Church.DTO;
+using Church.Models;
 using Church.ServiceInterfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -56,6 +57,24 @@ namespace Church.Controllers
             await _notificationService.DeactivateNotification(id, userId);
             return Ok();
         }
+
+        [HttpGet("{notificationId}")]
+        public async Task<IActionResult> GetNotificationById(string notificationId)
+        {
+            var notification = await _notificationService.GetNotificationById(notificationId);
+            if (notification == null)
+                return NotFound();
+            return Ok(notification);
+        }
+
+        [Authorize(Roles = "Admin,Pastor,Deacon")]
+        [HttpPut("update")]
+        public async Task<IActionResult> UpdateNotification(Notification notification)
+        {
+            await _notificationService.UpdateNotification(notification);
+            return Ok();
+        }
+
 
     }
 
