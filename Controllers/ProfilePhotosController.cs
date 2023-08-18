@@ -18,16 +18,24 @@ namespace Church.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddProfilePhoto([FromBody] byte[] photo)
+        public async Task<IActionResult> AddProfilePhoto(IFormFile photo)
         {
             var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
 
             if (string.IsNullOrEmpty(userId))
                 return Unauthorized();
 
+            if (photo == null || photo.Length == 0)
+                return BadRequest("Invalid photo file.");
+
+            using var memoryStream = new MemoryStream();
+            await photo.CopyToAsync(memoryStream);
+
+            var photoBytes = memoryStream.ToArray();
+
             await _profilePhotoService.DeleteProfilePhotoByUserId(userId);
 
-            var profilePhoto = await _profilePhotoService.AddProfilePhoto(photo, userId);
+            var profilePhoto = await _profilePhotoService.AddProfilePhoto(photoBytes, userId);
             return Ok(profilePhoto);
         }
 
