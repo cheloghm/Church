@@ -6,6 +6,5 @@
         public string GuestOf { get; set; }
         public string OtherRemarks { get; set; }
         public DateTime DateEntered { get; set; }
-        public List<string> OtherGuests { get; set; }
     }
 }

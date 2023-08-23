@@ -3,6 +3,7 @@ using Church.ServiceInterfaces;
 using Church.Repositories;
 using Church.Services;
 using Microsoft.Extensions.DependencyInjection;
+using Church.Models;
 
 namespace Church.Extensions
 {
@@ -12,8 +13,10 @@ namespace Church.Extensions
         {
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IAuthRepository, AuthRepository>();
-            services.AddScoped<IVisitorService, VisitorService>();
-            services.AddScoped<IVisitorRepository, VisitorRepository>();
+            services.AddScoped<IGenericService<Visitor>, GenericService<Visitor>>();
+            services.AddScoped<IGenericRepository<Visitor>, GenericRepository<Visitor>>();
+            services.AddScoped<IGenericService<Announcement>, GenericService<Announcement>>();
+            services.AddScoped<IGenericRepository<Announcement>, GenericRepository<Announcement>>();
             services.AddScoped<IRequestService, RequestService>();
             services.AddScoped<IRequestRepository, RequestRepository>();
             services.AddScoped<INotificationService, NotificationService>();

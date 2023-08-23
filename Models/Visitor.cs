@@ -23,7 +23,5 @@ namespace Church.Models
         [BsonElement("DateEntered")]
         public DateTime DateEntered { get; set; }
 
-        [BsonElement("OtherGuests")]
-        public List<string> OtherGuests { get; set; }
     }
 }

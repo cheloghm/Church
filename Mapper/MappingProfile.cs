@@ -21,6 +21,9 @@ namespace Church.Mapper
 
             CreateMap<Visitor, VisitorDTO>();
             CreateMap<VisitorDTO, Visitor>();
+
+            CreateMap<Announcement, AnnouncementDTO>();
+            CreateMap<AnnouncementDTO, Announcement>();
         }
     }
 }
