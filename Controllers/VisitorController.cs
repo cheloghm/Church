@@ -11,59 +11,62 @@ using AutoMapper;
 
 namespace Church.Controllers
 {
-    [Authorize(Roles = "Admin,Pastor,Deacon")]
     [Route("api/[controller]")]
     [ApiController]
     public class VisitorController : ControllerBase
     {
-        private readonly IVisitorService _visitorService;
-        private readonly IMapper _visitorMapper;
+        private readonly IGenericService<Visitor> _visitorService; // Use the generic service
+        private readonly IMapper _mapper;
 
-        public VisitorController(IVisitorService visitorService, IMapper visitorMapper)
+        public VisitorController(IGenericService<Visitor> visitorService, IMapper mapper)
         {
             _visitorService = visitorService;
-            _visitorMapper = visitorMapper;
+            _mapper = mapper;
         }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<VisitorDTO>>> GetAllVisitors()
         {
-            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-            // You can now use userId to filter or perform actions based on the authenticated user
-
-            var visitors = await _visitorService.GetAllVisitors();
-            return Ok(_visitorMapper.Map<IEnumerable<VisitorDTO>>(visitors));
+            var visitors = await _visitorService.GetAllAsync();
+            return Ok(_mapper.Map<IEnumerable<VisitorDTO>>(visitors));
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<VisitorDTO>> GetVisitor(string id)
         {
-            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-            // You can now use userId to filter or perform actions based on the authenticated user
-
-            var visitor = await _visitorService.GetVisitor(id);
+            var visitor = await _visitorService.GetByIdAsync(id);
             if (visitor == null) return NotFound();
-            return Ok(_visitorMapper.Map<VisitorDTO>(visitor)); // Corrected the mapping
+            return Ok(_mapper.Map<VisitorDTO>(visitor));
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateVisitor(string id, VisitorDTO visitorDto)
+        {
+            var existingVisitor = await _visitorService.GetByIdAsync(id);
+            if (existingVisitor == null)
+            {
+                return NotFound();
+            }
+
+            var visitorToUpdate = _mapper.Map<Visitor>(visitorDto);
+            visitorToUpdate.Id = id; // Ensure the ID remains the same
+
+            var updatedVisitor = await _visitorService.UpdateAsync(visitorToUpdate, id); // Pass both the entity and its ID
+            return Ok(_mapper.Map<VisitorDTO>(updatedVisitor));
         }
 
         [HttpPost]
-        public async Task<ActionResult<VisitorDTO>> PostVisitor(Visitor visitor)
+        public async Task<ActionResult<VisitorDTO>> PostVisitor(VisitorDTO visitorDto)
         {
-            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-            // You can now use userId to filter or perform actions based on the authenticated user
-
-            await _visitorService.AddVisitor(visitor);
-            return CreatedAtAction("GetVisitor", new { id = visitor.Id }, _visitorMapper.Map<VisitorDTO>(visitor)); // Corrected the mapping
+            var visitor = _mapper.Map<Visitor>(visitorDto);
+            await _visitorService.AddAsync(visitor);
+            return CreatedAtAction("GetVisitor", new { id = visitor.Id }, _mapper.Map<VisitorDTO>(visitor));
         }
 
-        // DELETE: api/Visitor/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteVisitor(string id)
         {
-            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-            // You can now use userId to filter or perform actions based on the authenticated user
-
-            await _visitorService.DeleteVisitor(id);
+            await _visitorService.DeleteAsync(id);
             return Ok();
         }
 
@@ -72,11 +75,8 @@ namespace Church.Controllers
         {
             try
             {
-                var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-                // You can now use userId to filter or perform actions based on the authenticated user
-
-                var visitors = _visitorService.GetVisitorsByDate(date);
-                var visitorDTOs = visitors.Select(v => _visitorMapper.Map<VisitorDTO>(v)); // Using the mapper here
+                var visitors = _visitorService.GetByDate(date); // This method should be added to the generic service
+                var visitorDTOs = visitors.Select(v => _mapper.Map<VisitorDTO>(v));
                 return Ok(visitorDTOs);
             }
             catch (Exception ex)
@@ -85,6 +85,5 @@ namespace Church.Controllers
                 return StatusCode(500, "Internal server error");
             }
         }
-
     }
 }

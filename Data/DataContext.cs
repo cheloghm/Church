@@ -20,6 +20,7 @@ namespace Church.Data
         public IMongoCollection<Role> Roles => _database.GetCollection<Role>("Roles");
         public IMongoCollection<Visitor> Visitors => _database.GetCollection<Visitor>("Visitors");
         public IMongoCollection<Request> Requests => _database.GetCollection<Request>("Requests");
+        public IMongoCollection<Announcement> Announcements => _database.GetCollection<Announcement>("Announcements");
         public IMongoCollection<Notification> Notifications => _database.GetCollection<Notification>("Notifications");
         public IMongoCollection<ProfilePhoto> ProfilePhotos => _database.GetCollection<ProfilePhoto>("ProfilePhotos");
 
