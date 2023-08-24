@@ -59,8 +59,10 @@ namespace Church.Controllers
         public async Task<ActionResult<AnnouncementDTO>> PostAnnouncement(AnnouncementDTO announcementDto)
         {
             var announcement = _mapper.Map<Announcement>(announcementDto);
-            await _announcementService.AddAsync(announcement);
-            return CreatedAtAction("GetAnnouncement", new { id = announcement.Id }, _mapper.Map<AnnouncementDTO>(announcement));
+            announcement.Id = null; // Ensure the ID is null so MongoDB generates a new one
+
+            var createdAnnouncement = await _announcementService.AddAsync(announcement);
+            return CreatedAtAction("GetAnnouncement", new { id = createdAnnouncement.Id }, _mapper.Map<AnnouncementDTO>(createdAnnouncement));
         }
 
         [HttpDelete("{id}")]

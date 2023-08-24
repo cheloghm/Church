@@ -1,5 +1,4 @@
-﻿using Amazon.Runtime.Internal;
-using AutoMapper;
+﻿using AutoMapper;
 using Church.DTO;
 using Church.Mapper;
 using Church.Models;

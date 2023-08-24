@@ -59,8 +59,10 @@ namespace Church.Controllers
         public async Task<ActionResult<VisitorDTO>> PostVisitor(VisitorDTO visitorDto)
         {
             var visitor = _mapper.Map<Visitor>(visitorDto);
-            await _visitorService.AddAsync(visitor);
-            return CreatedAtAction("GetVisitor", new { id = visitor.Id }, _mapper.Map<VisitorDTO>(visitor));
+            visitor.Id = null; // Ensure the ID is null so MongoDB generates a new one
+
+            var createdVisitor = await _visitorService.AddAsync(visitor);
+            return CreatedAtAction("GetVisitor", new { id = createdVisitor.Id }, _mapper.Map<VisitorDTO>(createdVisitor));
         }
 
         [HttpDelete("{id}")]

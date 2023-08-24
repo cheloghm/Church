@@ -1,5 +1,4 @@
-﻿using Amazon.Runtime.Internal;
-using Church.Models;
+﻿using Church.Models;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 
