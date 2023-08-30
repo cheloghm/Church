@@ -10,6 +10,9 @@ namespace Church.Models
         [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; }
 
+        [BsonElement("Title")]
+        public string Title { get; set; }
+
         [BsonElement("Message")]
         public string Message { get; set; }
 
