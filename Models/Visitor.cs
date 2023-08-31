@@ -20,8 +20,14 @@ namespace Church.Models
         [BsonElement("OtherRemarks")]
         public string OtherRemarks { get; set; }
 
-        [BsonElement("DateEntered")]
-        public DateTime DateEntered { get; set; }
+        [BsonIgnore]
+        public DateTime DateCreated { get; set; }
 
+        [BsonElement("DateCreatedString")]
+        public string DateCreatedString
+        {
+            get => DateCreated.ToString("yyyy-MM-dd");
+            set => DateCreated = DateTime.Parse(value);
+        }
     }
 }

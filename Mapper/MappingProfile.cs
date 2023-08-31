@@ -19,11 +19,18 @@ namespace Church.Mapper
 
             CreateMap<UpdateUserDTO, User>();
 
-            CreateMap<Visitor, VisitorDTO>();
-            CreateMap<VisitorDTO, Visitor>();
+            CreateMap<Visitor, VisitorDTO>()
+            .ForMember(dest => dest.DateCreated, opt => opt.MapFrom(src => src.DateCreatedString));
 
-            CreateMap<Announcement, AnnouncementDTO>();
-            CreateMap<AnnouncementDTO, Announcement>();
+            CreateMap<VisitorDTO, Visitor>()
+                .ForMember(dest => dest.DateCreated, opt => opt.Ignore()); // Ignore this field when mapping from DTO to model
+
+            CreateMap<Announcement, AnnouncementDTO>()
+            .ForMember(dest => dest.DateCreated, opt => opt.MapFrom(src => src.DateCreatedString));
+
+            CreateMap<AnnouncementDTO, Announcement>()
+                .ForMember(dest => dest.DateCreated, opt => opt.Ignore()); // Ignore this field when mapping from DTO to model
+
         }
     }
 }

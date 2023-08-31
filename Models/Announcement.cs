@@ -16,7 +16,14 @@ namespace Church.Models
         [BsonElement("Message")]
         public string Message { get; set; }
 
-        [BsonElement("DateCreated")]
+        [BsonIgnore] // Ignore this field when saving to MongoDB
         public DateTime DateCreated { get; set; }
+
+        [BsonElement("DateCreatedString")]
+        public string DateCreatedString
+        {
+            get => DateCreated.ToString("yyyy-MM-dd");
+            set => DateCreated = DateTime.Parse(value);
+        }
     }
 }

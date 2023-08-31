@@ -60,6 +60,7 @@ namespace Church.Controllers
         {
             var visitor = _mapper.Map<Visitor>(visitorDto);
             visitor.Id = null; // Ensure the ID is null so MongoDB generates a new one
+            visitor.DateCreated = DateTime.UtcNow.Date; // Automatically set the date to the current date (year, month, day)
 
             var createdVisitor = await _visitorService.AddAsync(visitor);
             return CreatedAtAction("GetVisitor", new { id = createdVisitor.Id }, _mapper.Map<VisitorDTO>(createdVisitor));
@@ -73,7 +74,7 @@ namespace Church.Controllers
         }
 
         [HttpGet("by-date")]
-        public IActionResult GetVisitorsByDate(DateTime date)
+        public IActionResult GetVisitorsByDate([FromQuery] DateTime date)
         {
             try
             {

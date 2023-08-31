@@ -60,6 +60,7 @@ namespace Church.Controllers
         {
             var announcement = _mapper.Map<Announcement>(announcementDto);
             announcement.Id = null; // Ensure the ID is null so MongoDB generates a new one
+            announcement.DateCreated = DateTime.UtcNow.Date; // Automatically set the date to the current date (year, month, day)
 
             var createdAnnouncement = await _announcementService.AddAsync(announcement);
             return CreatedAtAction("GetAnnouncement", new { id = createdAnnouncement.Id }, _mapper.Map<AnnouncementDTO>(createdAnnouncement));

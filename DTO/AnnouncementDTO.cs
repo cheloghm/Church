@@ -7,6 +7,6 @@ namespace Church.DTO
         public string Id { get; set; }
         public string Title { get; set; }
         public string Message { get; set; }
-        public DateTime DateCreated { get; set; }
+        public string DateCreated { get; set; }
     }
 }

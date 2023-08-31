@@ -1,6 +1,7 @@
 ﻿using Church.Data;
 using Church.Models;
 using Church.RepositoryInterfaces;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -42,19 +43,22 @@ namespace Church.Repositories
 
         public IEnumerable<T> GetByDate(DateTime date)
         {
-            var filter = Builders<T>.Filter.Eq("DateCreated", date);
+            var dateString = date.ToString("yyyy-MM-dd");
+            var filter = Builders<T>.Filter.Eq("DateCreatedString", dateString);
             return _collection.Find(filter).ToList();
         }
 
         public async Task<T> UpdateAsync(T entity, string id)
         {
-            await _collection.ReplaceOneAsync(Builders<T>.Filter.Eq("_id", id), entity);
+            var objectId = new ObjectId(id);
+            await _collection.ReplaceOneAsync(Builders<T>.Filter.Eq("_id", objectId), entity);
             return entity;
         }
 
         public async Task<T> GetByIdAsync(string id)
         {
-            return await _collection.Find(Builders<T>.Filter.Eq("_id", id)).FirstOrDefaultAsync();
+            var objectId = new ObjectId(id);
+            return await _collection.Find(Builders<T>.Filter.Eq("_id", objectId)).FirstOrDefaultAsync();
         }
 
         public async Task<IEnumerable<T>> GetAllAsync()
@@ -64,7 +68,8 @@ namespace Church.Repositories
 
         public async Task DeleteAsync(string id)
         {
-            await _collection.DeleteOneAsync(Builders<T>.Filter.Eq("_id", id));
+            var objectId = new ObjectId(id);
+            await _collection.DeleteOneAsync(Builders<T>.Filter.Eq("_id", objectId));
         }
     }
 }
