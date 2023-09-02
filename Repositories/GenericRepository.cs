@@ -71,5 +71,12 @@ namespace Church.Repositories
             var objectId = new ObjectId(id);
             await _collection.DeleteOneAsync(Builders<T>.Filter.Eq("_id", objectId));
         }
+
+        public async Task<IEnumerable<T>> SearchAsync(string query)
+        {
+            var filter = Builders<T>.Filter.Text(query);
+            return await _collection.Find(filter).ToListAsync();
+        }
+
     }
 }

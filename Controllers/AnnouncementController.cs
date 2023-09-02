@@ -89,5 +89,13 @@ namespace Church.Controllers
             }
         }
 
+        [HttpGet("search")]
+        public async Task<ActionResult<IEnumerable<AnnouncementDTO>>> SearchAnnouncements(string query)
+        {
+            var announcements = await _announcementService.SearchAsync(query);
+            return Ok(_mapper.Map<IEnumerable<AnnouncementDTO>>(announcements));
+        }
+
+
     }
 }

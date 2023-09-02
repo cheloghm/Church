@@ -44,5 +44,11 @@ namespace Church.Services
         {
             await _repository.DeleteAsync(id);
         }
+
+        public async Task<IEnumerable<T>> SearchAsync(string query)
+        {
+            return await _repository.SearchAsync(query);
+        }
+
     }
 }

@@ -12,5 +12,6 @@ namespace Church.RepositoryInterfaces
         Task<T> AddAsync(T entity);
         Task<T> UpdateAsync(T entity, string id);
         Task DeleteAsync(string id);
+        Task<IEnumerable<T>> SearchAsync(string query);
     }
 }

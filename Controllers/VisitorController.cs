@@ -88,5 +88,13 @@ namespace Church.Controllers
                 return StatusCode(500, "Internal server error");
             }
         }
+
+        [HttpGet("search")]
+        public async Task<ActionResult<IEnumerable<VisitorDTO>>> SearchVisitors(string query)
+        {
+            var visitors = await _visitorService.SearchAsync(query);
+            return Ok(_mapper.Map<IEnumerable<VisitorDTO>>(visitors));
+        }
+
     }
 }
