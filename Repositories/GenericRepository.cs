@@ -74,8 +74,29 @@ namespace Church.Repositories
 
         public async Task<IEnumerable<T>> SearchAsync(string query)
         {
-            var filter = Builders<T>.Filter.Text(query);
-            return await _collection.Find(filter).ToListAsync();
+            if (typeof(T) == typeof(Visitor))
+            {
+                var builder = Builders<Visitor>.Filter;
+                var filter = builder.Regex(v => v.FullName, new BsonRegularExpression(query, "i")) |
+                             builder.Regex(v => v.GuestOf, new BsonRegularExpression(query, "i")) |
+                             builder.Regex(v => v.OtherRemarks, new BsonRegularExpression(query, "i"));
+
+                var collection = _collection as IMongoCollection<Visitor>;
+                return (IEnumerable<T>)await collection.Find(filter).ToListAsync();
+            }
+            else if (typeof(T) == typeof(Announcement))
+            {
+                var builder = Builders<Announcement>.Filter;
+                var filter = builder.Regex(a => a.Title, new BsonRegularExpression(query, "i")) |
+                             builder.Regex(a => a.Message, new BsonRegularExpression(query, "i"));
+
+                var collection = _collection as IMongoCollection<Announcement>;
+                return (IEnumerable<T>)await collection.Find(filter).ToListAsync();
+            }
+            else
+            {
+                throw new Exception($"Entity type {typeof(T).Name} is not supported for search.");
+            }
         }
 
     }
