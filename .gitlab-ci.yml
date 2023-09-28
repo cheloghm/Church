@@ -1,0 +1,51 @@
+image: mcr.microsoft.com/dotnet/sdk:7.0
+
+stages:
+  - test
+  - dev
+  - prod
+
+variables:
+  DOCKERHUB_IMAGE: cheloghm/church 
+  ECR_REGISTRY_URL: 717152884435.dkr.ecr.eu-west-2.amazonaws.com
+  ECR_IMAGE: $ECR_REGISTRY_URL/church 
+
+# Job for Testing and building the Docker image
+test:
+  stage: test
+  script:
+    # Restoring and testing the .NET application
+    - dotnet restore
+    - dotnet build --no-restore
+    - dotnet test --no-build
+    
+    # Building the Docker image
+    - docker build -t $DOCKERHUB_IMAGE:$CI_COMMIT_SHA .
+
+    # Logging into DockerHub and pushing the image
+    - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+    - docker push $DOCKERHUB_IMAGE:$CI_COMMIT_SHA
+    
+    # Logging into AWS ECR and pushing the image
+    - aws ecr get-login-password --region eu-west-2 | docker login --username AWS --password-stdin $ECR_REGISTRY_URL
+    - docker tag $DOCKERHUB_IMAGE:$CI_COMMIT_SHA $ECR_IMAGE:$CI_COMMIT_SHA
+    - docker push $ECR_IMAGE:$CI_COMMIT_SHA
+
+  only:
+    - branches
+
+# Job for Deployment to Dev
+deploy_dev:
+  stage: dev
+  script:
+    - echo "Deployment to Dev using the image from Dockerhub/ECR"
+    # Implement your deployment scripts or commands here
+  when: manual
+
+# Job for Deployment to Prod
+deploy_prod:
+  stage: prod
+  script:
+    - echo "Deployment to Prod using the image from Dockerhub/ECR"
+    # Implement your deployment scripts or commands here
+  when: manual
